@@ -1,8 +1,8 @@
 package types
 
 type Student struct {
-	Id    int64
-	Name  string `validate:"required"`
-	Email string `validate:"required"`
-	Age   int    `validate:"required"`
+	Id    int64  `json:"id"`
+	Name  string `validate:"required" json:"name"`
+	Email string `validate:"required" json:"email"`
+	Age   int    `validate:"required" json:"age"`
 }
