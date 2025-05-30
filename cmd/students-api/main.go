@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"log/slog"
 	"net/http"
@@ -12,6 +11,7 @@ import (
 	"time"
 
 	"github.com/z1shivam/learning-go/internal/config"
+	"github.com/z1shivam/learning-go/internal/http/handlers/student"
 )
 
 func main() {
@@ -21,13 +21,11 @@ func main() {
 	// database setup
 	// setup router
 	router := http.NewServeMux()
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome to students api"))
-	})
+	router.HandleFunc("POST /api/students", student.New())
 
 	// setup server
 	server := http.Server{
-		Addr:    cfg.Addr,
+		Addr:    cfg.HttpServer.Addr,
 		Handler: router,
 	}
 
@@ -36,7 +34,7 @@ func main() {
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		fmt.Printf("Server started at port: %s", cfg.Addr)
+		slog.Info("Server started at: ", slog.String("address", cfg.HttpServer.Addr))
 		err := server.ListenAndServe()
 		if err != nil {
 			log.Fatal("Failed to start server.")
