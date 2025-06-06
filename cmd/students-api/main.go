@@ -10,21 +10,22 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/z1shivam/learning-go/internal/config"
 	"github.com/z1shivam/learning-go/internal/http/handlers/student"
 	"github.com/z1shivam/learning-go/internal/storage/sqlite"
 )
 
 func main() {
 	// load config
-	// cfg := config.MustLoad()
+	cfg := config.MustLoad()
 
 	// database setup
-	storage, err := sqlite.New()
+	storage, err := sqlite.New(cfg)
 	if err != nil {
 		log.Fatal("Database not connected")
 	}
 
-	slog.Info("Storage Initialized.", slog.String("env", os.Getenv("ENV")), slog.String("version", "1.0.0"))
+	slog.Info("Storage Initialized.", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
 
 	// setup router
 	router := http.NewServeMux()
@@ -33,7 +34,7 @@ func main() {
 
 	// setup server
 	server := http.Server{
-		Addr:    os.Getenv("ADDR"),
+		Addr:    cfg.HttpServer.Addr,
 		Handler: router,
 	}
 
@@ -42,7 +43,7 @@ func main() {
 	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
-		slog.Info("Server started at: ", slog.String("address", os.Getenv("ADDR")))
+		slog.Info("Server started at: ", slog.String("address", cfg.HttpServer.Addr))
 		err := server.ListenAndServe()
 		if err != nil {
 			log.Fatal("Failed to start server.")

@@ -3,9 +3,9 @@ package sqlite
 import (
 	"database/sql"
 	"fmt"
-	"os"
 
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/z1shivam/learning-go/internal/config"
 	"github.com/z1shivam/learning-go/internal/types"
 )
 
@@ -13,18 +13,8 @@ type Sqlite struct {
 	Db *sql.DB
 }
 
-func New() (*Sqlite, error) {
-	file, err := os.Create("storage.db")
-	if err != nil {
-		panic(err) // Handle error in a real application
-	}
-
-	// Close the file
-	err = file.Close()
-	if err != nil {
-		panic(err) // Handle error in a real application
-	}
-	db, err := sql.Open("sqlite3", os.Getenv("STORAGE_PATH"))
+func New(cfg *config.Config) (*Sqlite, error) {
+	db, err := sql.Open("sqlite3", cfg.StoragePath)
 	if err != nil {
 		return nil, err
 	}

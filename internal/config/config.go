@@ -9,12 +9,12 @@ import (
 )
 
 type HttpServer struct {
-	Addr string `yaml:"address" env:"ADDR" env-required:"true" env-default:"localhost:8000"`
+	Addr string `yaml:"address" env-required:"true" env-default:"localhost:8000"`
 }
 
 type Config struct {
 	Env         string `yaml:"env" env:"ENV" env-required:"true" env-default:"dev"`
-	StoragePath string `yaml:"storage_path" env:"STORAGE_PATH" env-required:"true"`
+	StoragePath string `yaml:"storage_path" env-required:"true"`
 	HttpServer  `yaml:"http_server"`
 }
 
@@ -31,25 +31,18 @@ func MustLoad() *Config {
 	}
 
 	if configPath == "" {
-		log.Println("Config path is not set.")
+		log.Fatal("Config path is not set.")
 	}
 
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		log.Printf("Config file does not exist %s", configPath)
+		log.Fatalf("Config file does not exist %s", configPath)
 	}
 
 	var cfg Config
 
-	if configPath != "" {
-		err := cleanenv.ReadConfig(configPath, &cfg)
-		if err != nil {
-			log.Fatalf("can not read config file: %s", err.Error())
-		}
-	} else {
-		err := cleanenv.ReadEnv(&cfg)
-		if err != nil {
-			log.Fatalf("can not read config file: %s", err.Error())
-		}
+	err := cleanenv.ReadConfig(configPath, &cfg)
+	if err != nil {
+		log.Fatalf("can not read config file: %s", err.Error())
 	}
 
 	return &cfg
