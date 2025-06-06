@@ -14,6 +14,16 @@ type Sqlite struct {
 }
 
 func New() (*Sqlite, error) {
+	file, err := os.Create("storage.db")
+	if err != nil {
+		panic(err) // Handle error in a real application
+	}
+
+	// Close the file
+	err = file.Close()
+	if err != nil {
+		panic(err) // Handle error in a real application
+	}
 	db, err := sql.Open("sqlite3", os.Getenv("STORAGE_PATH"))
 	if err != nil {
 		return nil, err
